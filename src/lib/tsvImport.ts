@@ -88,6 +88,21 @@ const splitPrerequisites = (value: string) =>
     .map((item) => item.trim())
     .filter(Boolean);
 
+export const exportCoursesToTsv = (courses: Course[]): string => {
+  const header = ['Semestre', 'id', 'Nome', 'CH', 'Pre-requisito', 'Natureza', 'Categoria'];
+  const idToCode = new Map(courses.map((c) => [c.id, c.code || c.id]));
+  const rows = courses.map((course) => [
+    String(course.semester),
+    course.code || course.id,
+    course.name,
+    String(course.workload),
+    course.prerequisites.map((id) => idToCode.get(id) ?? id).join(', '),
+    course.nature ?? '',
+    course.category ?? '',
+  ]);
+  return [header, ...rows].map((row) => row.join('\t')).join('\n');
+};
+
 export const parseCurriculumTsv = (text: string): TsvImportResult => {
   const rows = parseTsvRows(text);
   if (rows.length < 2) {

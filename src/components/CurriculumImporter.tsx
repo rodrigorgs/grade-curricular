@@ -1,9 +1,10 @@
 import { useMemo, useState, type ChangeEvent } from 'react';
-import { FileUp, Upload } from 'lucide-react';
-import { parseCurriculumTsv } from '../lib/tsvImport';
+import { ClipboardCopy, FileUp, Upload } from 'lucide-react';
+import { exportCoursesToTsv, parseCurriculumTsv } from '../lib/tsvImport';
 import { useCurriculumStore } from '../store/curriculumStore';
 
 export function CurriculumImporter() {
+  const courses = useCurriculumStore((state) => state.courses);
   const importCourses = useCurriculumStore((state) => state.importCourses);
   const [text, setText] = useState('');
   const [message, setMessage] = useState('Cole um TSV ou selecione um arquivo para importar.');
@@ -18,6 +19,11 @@ export function CurriculumImporter() {
 
     setText(await file.text());
     setMessage(`${file.name} carregado para revisao.`);
+  };
+
+  const onExport = async () => {
+    await navigator.clipboard.writeText(exportCoursesToTsv(courses));
+    setMessage('TSV copiado para a área de transferência.');
   };
 
   const onImport = () => {
@@ -39,6 +45,10 @@ export function CurriculumImporter() {
           <h2>Importar TSV</h2>
           <p>{message}</p>
         </div>
+        <button type="button" onClick={onExport}>
+          <ClipboardCopy size={16} />
+          Exportar TSV
+        </button>
         <label className="file-button">
           <FileUp size={16} />
           Arquivo
