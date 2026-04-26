@@ -238,7 +238,7 @@ select[multiple] {
 
 .semester-ruler {
   display: flex;
-  gap: 40px;
+  gap: 14px;
   left: 30px;
   pointer-events: none;
   position: absolute;
@@ -258,7 +258,7 @@ select[multiple] {
   height: 34px;
   justify-content: center;
   text-transform: uppercase;
-  width: 280px;
+  width: 190px;
 }
 
 .react-flow__pane {
@@ -279,7 +279,7 @@ select[multiple] {
   align-items: center;
   height: 64px;
   padding: 10px 12px;
-  width: 220px;
+  width: 170px;
   transition:
     border-color 150ms ease,
     box-shadow 150ms ease,

@@ -16,10 +16,10 @@ import CourseNode from './CourseNode';
 import { useCurriculumStore } from '../store/curriculumStore';
 import type { Course } from '../types';
 
-const nodeWidth = 220;
+const nodeWidth = 170;
 const nodeHeight = 64;
-const semesterWidth = 280;
-const semesterGap = 40;
+const semesterWidth = 190;
+const semesterGap = 14;
 const topOffset = 72;
 
 const nodeTypes: NodeTypes = {
