@@ -130,6 +130,18 @@ export function CurriculumFlow() {
     ]);
   }, [courses, hoveredCourseId]);
 
+  const highlightedSummary = useMemo(() => {
+    if (!highlightIds) return null;
+
+    const selectedCourses = courses.filter((course) => highlightIds.has(course.id));
+    const workload = selectedCourses.reduce((total, course) => total + course.workload, 0);
+
+    return {
+      courseCount: selectedCourses.length,
+      workload,
+    };
+  }, [courses, highlightIds]);
+
   const nodesWithSelection = useMemo(
     () =>
       layout.nodes.map((node) => {
@@ -272,6 +284,16 @@ export function CurriculumFlow() {
           </div>
         ))}
       </div>
+      {highlightedSummary ? (
+        <div className="flow-highlight-summary" role="status" aria-live="polite">
+          <strong>{highlightedSummary.workload}h</strong>
+          <span>
+            {highlightedSummary.courseCount} disciplina
+            {highlightedSummary.courseCount > 1 ? 's' : ''} destacada
+            {highlightedSummary.courseCount > 1 ? 's' : ''}
+          </span>
+        </div>
+      ) : null}
       <ReactFlow
         nodes={nodes}
         edges={edges}

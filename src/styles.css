@@ -261,6 +261,33 @@ select[multiple] {
   width: 190px;
 }
 
+.flow-highlight-summary {
+  align-items: baseline;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid #dce4ee;
+  border-radius: 8px;
+  box-shadow: 0 10px 24px rgba(23, 32, 51, 0.12);
+  color: #526173;
+  display: inline-flex;
+  gap: 10px;
+  padding: 8px 12px;
+  position: absolute;
+  right: 14px;
+  top: 14px;
+  z-index: 5;
+}
+
+.flow-highlight-summary strong {
+  color: #172033;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.flow-highlight-summary span {
+  font-size: 0.82rem;
+  line-height: 1;
+}
+
 .react-flow__pane {
   cursor: grab;
 }
