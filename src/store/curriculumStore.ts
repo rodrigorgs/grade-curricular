@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import { initialCourses } from '../data/initialCourses';
 import {
   clampSemester,
@@ -37,7 +38,9 @@ const createId = (course: CourseDraft, existingIds: string[]) => {
   return `${base}-${suffix}`;
 };
 
-export const useCurriculumStore = create<CurriculumState>((set) => ({
+export const useCurriculumStore = create<CurriculumState>()(
+  persist(
+    (set) => ({
   courses: initialCourses,
   selectedCourseId: null,
   selectCourse: (id) => set({ selectedCourseId: id }),
@@ -131,4 +134,7 @@ export const useCurriculumStore = create<CurriculumState>((set) => ({
       ),
     })),
   reset: () => set({ courses: initialCourses, selectedCourseId: null }),
-}));
+}),
+    { name: 'curriculum', partialize: (state) => ({ courses: state.courses }) },
+  ),
+);

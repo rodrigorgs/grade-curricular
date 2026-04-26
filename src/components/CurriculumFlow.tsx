@@ -280,6 +280,8 @@ export function CurriculumFlow() {
         fitViewOptions={{ padding: 0.18 }}
         minZoom={0.35}
         maxZoom={1.4}
+        panOnScroll
+        zoomOnScroll={false}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
