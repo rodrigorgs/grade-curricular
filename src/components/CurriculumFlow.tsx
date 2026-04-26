@@ -108,6 +108,14 @@ export function CurriculumFlow() {
   const semesters = Array.from({ length: Math.max(maxSemester + 1, 8) }, (_, index) => index + 1);
 
   const layout = useMemo(() => buildLayout(courses), [courses]);
+  const semesterWorkload = useMemo(() => {
+    const workloadMap = new Map<number, number>();
+    courses.forEach((course) => {
+      const current = workloadMap.get(course.semester) ?? 0;
+      workloadMap.set(course.semester, current + course.workload);
+    });
+    return workloadMap;
+  }, [courses]);
   const [nodes, setNodes, onNodesChange] = useNodesState(layout.nodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(layout.edges);
   const highlightIds = useMemo(() => {
@@ -278,11 +286,14 @@ export function CurriculumFlow() {
       }}
     >
       <div className="semester-ruler" aria-hidden="true">
-        {semesters.map((semester) => (
-          <div className="semester-ruler__item" key={semester}>
-            {semester}o semestre
-          </div>
-        ))}
+        {semesters.map((semester) => {
+          const workload = semesterWorkload.get(semester) ?? 0;
+          return (
+            <div className="semester-ruler__item" key={semester}>
+              {semester}º semestre ({workload}h)
+            </div>
+          );
+        })}
       </div>
       {highlightedSummary ? (
         <div className="flow-highlight-summary" role="status" aria-live="polite">
