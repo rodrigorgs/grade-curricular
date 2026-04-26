@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Columns3, Table2, Workflow } from 'lucide-react';
+import { Columns3, Eye, EyeOff, Table2, Workflow } from 'lucide-react';
 import { CurriculumFlow } from './components/CurriculumFlow';
 import { CurriculumImporter } from './components/CurriculumImporter';
 import { CurriculumTable } from './components/CurriculumTable';
@@ -7,7 +7,8 @@ import { CurriculumTable } from './components/CurriculumTable';
 type ViewMode = 'split' | 'flow' | 'table';
 
 function App() {
-  const [viewMode, setViewMode] = useState<ViewMode>('split');
+  const [viewMode, setViewMode] = useState<ViewMode>('flow');
+  const [isImporterVisible, setIsImporterVisible] = useState(false);
 
   return (
     <main className="app-shell">
@@ -50,9 +51,19 @@ function App() {
           <Table2 size={16} />
           Tabela
         </button>
+        <button
+          type="button"
+          className={isImporterVisible ? 'is-active' : ''}
+          onClick={() => setIsImporterVisible((visible) => !visible)}
+          aria-pressed={isImporterVisible}
+          aria-label={isImporterVisible ? 'Ocultar painel TSV' : 'Mostrar painel TSV'}
+        >
+          {isImporterVisible ? <EyeOff size={16} /> : <Eye size={16} />}
+          TSV
+        </button>
       </div>
 
-      {viewMode === 'split' ? <CurriculumImporter /> : null}
+      {viewMode === 'split' && isImporterVisible ? <CurriculumImporter /> : null}
 
       <div className={`workspace workspace--${viewMode}`}>
         {viewMode !== 'table' ? <CurriculumFlow /> : null}
