@@ -166,6 +166,17 @@ export function CurriculumTable() {
         ),
       },
       {
+        accessorKey: 'department',
+        header: 'Departamento',
+        cell: ({ row, getValue }) => (
+          <input
+            value={getValue<string | undefined>() ?? ''}
+            onChange={(event) => updateCourse(row.original.id, { department: event.target.value })}
+            aria-label={`Departamento de ${row.original.name}`}
+          />
+        ),
+      },
+      {
         id: 'actions',
         header: '',
         cell: ({ row }) => (

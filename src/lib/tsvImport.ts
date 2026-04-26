@@ -89,7 +89,7 @@ const splitPrerequisites = (value: string) =>
     .filter(Boolean);
 
 export const exportCoursesToTsv = (courses: Course[]): string => {
-  const header = ['Semestre', 'id', 'Nome', 'CH', 'Pre-requisito', 'Natureza', 'Categoria'];
+  const header = ['Semestre', 'id', 'Nome', 'CH', 'Pre-requisito', 'Natureza', 'Categoria', 'Departamento'];
   const idToCode = new Map(courses.map((c) => [c.id, c.code || c.id]));
   const rows = courses.map((course) => [
     String(course.semester),
@@ -99,6 +99,7 @@ export const exportCoursesToTsv = (courses: Course[]): string => {
     course.prerequisites.map((id) => idToCode.get(id) ?? id).join(', '),
     course.nature ?? '',
     course.category ?? '',
+    course.department ?? '',
   ]);
   return [header, ...rows].map((row) => row.join('\t')).join('\n');
 };
@@ -117,6 +118,7 @@ export const parseCurriculumTsv = (text: string): TsvImportResult => {
   const prerequisitesIndex = findColumn(headers, ['prerequisito']);
   const natureIndex = findColumn(headers, ['natureza']);
   const categoryIndex = findColumn(headers, ['categoria']);
+  const departmentIndex = findColumn(headers, ['departamento', 'depto', 'department']);
 
   const required = [
     ['Semestre', semesterIndex],
@@ -175,6 +177,7 @@ export const parseCurriculumTsv = (text: string): TsvImportResult => {
         status: 'planejada',
         nature: natureIndex >= 0 ? row[natureIndex] || undefined : undefined,
         category: categoryIndex >= 0 ? row[categoryIndex] || undefined : undefined,
+        department: departmentIndex >= 0 ? row[departmentIndex] || undefined : undefined,
       },
     ];
   });

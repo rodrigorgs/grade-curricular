@@ -10,6 +10,7 @@ export type Course = {
   status: CourseStatus;
   nature?: string;
   category?: string;
+  department?: string;
 };
 
 export type CourseDraft = Omit<Course, 'id'>;

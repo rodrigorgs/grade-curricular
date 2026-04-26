@@ -62,7 +62,7 @@ export function CurriculumImporter() {
           setText(event.target.value);
           setMessage('Dados prontos para revisao.');
         }}
-        placeholder="Cole aqui as colunas Semestre, id, Nome, CH, Pre-requisito, Natureza e Categoria."
+        placeholder="Cole aqui as colunas Semestre, id, Nome, CH, Pre-requisito, Natureza, Categoria e Departamento."
         aria-label="Dados TSV da grade curricular"
       />
 
