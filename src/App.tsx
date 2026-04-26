@@ -63,7 +63,7 @@ function App() {
         </button>
       </div>
 
-      {viewMode === 'split' && isImporterVisible ? <CurriculumImporter /> : null}
+      {isImporterVisible ? <CurriculumImporter /> : null}
 
       <div className={`workspace workspace--${viewMode}`}>
         {viewMode !== 'table' ? <CurriculumFlow /> : null}
