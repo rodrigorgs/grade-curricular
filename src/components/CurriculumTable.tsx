@@ -10,8 +10,6 @@ import { isValidPrerequisite, maxSemester, minSemester } from '../lib/curriculum
 import { useCurriculumStore } from '../store/curriculumStore';
 import type { Course, CourseDraft } from '../types';
 
-const statusOptions: Course['status'][] = ['planejada', 'em-curso', 'concluida'];
-
 const emptyCourse = (semester: number): CourseDraft => ({
   code: 'NOVA',
   name: 'Nova disciplina',
@@ -123,25 +121,6 @@ export function CurriculumTable() {
             </select>
           );
         },
-      },
-      {
-        accessorKey: 'status',
-        header: 'Status',
-        cell: ({ row, getValue }) => (
-          <select
-            value={getValue<Course['status']>()}
-            onChange={(event) =>
-              updateCourse(row.original.id, { status: event.target.value as Course['status'] })
-            }
-            aria-label={`Status de ${row.original.name}`}
-          >
-            {statusOptions.map((status) => (
-              <option value={status} key={status}>
-                {status}
-              </option>
-            ))}
-          </select>
-        ),
       },
       {
         accessorKey: 'nature',
