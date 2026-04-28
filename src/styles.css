@@ -236,17 +236,7 @@ select[multiple] {
   min-height: 640px;
 }
 
-.semester-ruler {
-  display: flex;
-  gap: 14px;
-  left: 30px;
-  pointer-events: none;
-  position: absolute;
-  top: 14px;
-  z-index: 4;
-}
-
-.semester-ruler__item {
+.semester-node {
   align-items: center;
   background: rgba(244, 247, 249, 0.9);
   border: 1px solid #dce4ee;
@@ -257,6 +247,7 @@ select[multiple] {
   font-weight: 800;
   height: 34px;
   justify-content: center;
+  pointer-events: none;
   text-transform: uppercase;
   width: 190px;
 }

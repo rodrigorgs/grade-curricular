@@ -41,100 +41,103 @@ const createId = (course: CourseDraft, existingIds: string[]) => {
 export const useCurriculumStore = create<CurriculumState>()(
   persist(
     (set) => ({
-  courses: initialCourses,
-  selectedCourseId: null,
-  selectCourse: (id) => set({ selectedCourseId: id }),
-  addCourse: (course) =>
-    set((state) => {
-      const id = createId(course, state.courses.map((item) => item.id));
-      const semester = clampSemester(course.semester);
-      const newCourse = { ...course, id, semester };
-      const nextCourses = [...state.courses, newCourse];
+      courses: initialCourses,
+      selectedCourseId: null,
+      selectCourse: (id) => set({ selectedCourseId: id }),
+      addCourse: (course) =>
+        set((state) => {
+          const id = createId(course, state.courses.map((item) => item.id));
+          const semester = clampSemester(course.semester);
+          const newCourse = { ...course, id, semester };
+          const nextCourses = [...state.courses, newCourse];
 
-      return {
-        courses: nextCourses.map((item) =>
-          item.id === id
-            ? {
-                ...item,
-                prerequisites: sanitizePrerequisites(nextCourses, id, item.prerequisites),
-              }
-            : item,
-        ),
-        selectedCourseId: id,
-      };
-    }),
-  importCourses: (courses) =>
-    set(() => {
-      const nextCourses = courses.map((course) => ({
-        ...course,
-        semester: clampSemester(course.semester),
-      }));
+          return {
+            courses: nextCourses.map((item) =>
+              item.id === id
+                ? {
+                    ...item,
+                    prerequisites: sanitizePrerequisites(nextCourses, id, item.prerequisites),
+                  }
+                : item,
+            ),
+            selectedCourseId: id,
+          };
+        }),
+      importCourses: (courses) =>
+        set(() => {
+          const nextCourses = courses.map((course) => ({
+            ...course,
+            semester: clampSemester(course.semester),
+          }));
 
-      return {
-        courses: nextCourses.map((course) => ({
-          ...course,
-          prerequisites: sanitizePrerequisites(nextCourses, course.id, course.prerequisites),
-        })),
-        selectedCourseId: null,
-      };
-    }),
-  updateCourse: (id, changes) =>
-    set((state) => {
-      const requestedSemester =
-        typeof changes.semester === 'number'
-          ? resolveAllowedSemester(state.courses, id, changes.semester)
-          : undefined;
-
-      const nextCourses = state.courses.map((course) =>
-        course.id === id
-          ? {
+          return {
+            courses: nextCourses.map((course) => ({
               ...course,
-              ...changes,
-              ...(requestedSemester ? { semester: requestedSemester } : {}),
-            }
-          : course,
-      );
+              prerequisites: sanitizePrerequisites(nextCourses, course.id, course.prerequisites),
+            })),
+            selectedCourseId: null,
+          };
+        }),
+      updateCourse: (id, changes) =>
+        set((state) => {
+          const requestedSemester =
+            typeof changes.semester === 'number'
+              ? resolveAllowedSemester(state.courses, id, changes.semester)
+              : undefined;
 
-      return {
-        courses: nextCourses.map((course) => ({
-          ...course,
-          prerequisites: sanitizePrerequisites(nextCourses, course.id, course.prerequisites),
-        })),
-      };
-    }),
-  removeCourse: (id) =>
-    set((state) => ({
-      courses: state.courses
-        .filter((course) => course.id !== id)
-        .map((course) => ({
-          ...course,
-          prerequisites: course.prerequisites.filter((prerequisite) => prerequisite !== id),
-        })),
-      selectedCourseId: state.selectedCourseId === id ? null : state.selectedCourseId,
-    })),
-  moveCourseToSemester: (id, semester) =>
-    set((state) => {
-      const allowedSemester = resolveAllowedSemester(state.courses, id, semester);
+          const nextCourses = state.courses.map((course) =>
+            course.id === id
+              ? {
+                  ...course,
+                  ...changes,
+                  ...(requestedSemester ? { semester: requestedSemester } : {}),
+                }
+              : course,
+          );
 
-      return {
-        courses: state.courses.map((course) =>
-          course.id === id ? { ...course, semester: allowedSemester } : course,
-        ),
-      };
-    }),
-  setPrerequisites: (id, prerequisites) =>
-    set((state) => ({
-      courses: state.courses.map((course) =>
-        course.id === id
-          ? {
+          return {
+            courses: nextCourses.map((course) => ({
               ...course,
-              prerequisites: sanitizePrerequisites(state.courses, id, prerequisites),
-            }
-          : course,
-      ),
-    })),
-  reset: () => set({ courses: initialCourses, selectedCourseId: null }),
-}),
-    { name: 'curriculum', partialize: (state) => ({ courses: state.courses }) },
+              prerequisites: sanitizePrerequisites(nextCourses, course.id, course.prerequisites),
+            })),
+          };
+        }),
+      removeCourse: (id) =>
+        set((state) => ({
+          courses: state.courses
+            .filter((course) => course.id !== id)
+            .map((course) => ({
+              ...course,
+              prerequisites: course.prerequisites.filter((prerequisite) => prerequisite !== id),
+            })),
+          selectedCourseId: state.selectedCourseId === id ? null : state.selectedCourseId,
+        })),
+      moveCourseToSemester: (id, semester) =>
+        set((state) => {
+          const allowedSemester = resolveAllowedSemester(state.courses, id, semester);
+
+          return {
+            courses: state.courses.map((course) =>
+              course.id === id ? { ...course, semester: allowedSemester } : course,
+            ),
+          };
+        }),
+      setPrerequisites: (id, prerequisites) =>
+        set((state) => ({
+          courses: state.courses.map((course) =>
+            course.id === id
+              ? {
+                  ...course,
+                  prerequisites: sanitizePrerequisites(state.courses, id, prerequisites),
+                }
+              : course,
+          ),
+        })),
+      reset: () => set({ courses: initialCourses, selectedCourseId: null }),
+    }),
+    {
+      name: 'curriculum',
+      partialize: (state) => ({ courses: state.courses }),
+    },
   ),
 );

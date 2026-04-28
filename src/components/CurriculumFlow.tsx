@@ -13,8 +13,11 @@ import ReactFlow, {
   useNodesState,
 } from 'reactflow';
 import CourseNode from './CourseNode';
+import SemesterNode, { type SemesterNodeData } from './SemesterNode';
 import { useCurriculumStore } from '../store/curriculumStore';
 import type { Course } from '../types';
+
+type FlowNodeData = Course | SemesterNodeData;
 
 const nodeWidth = 170;
 const nodeHeight = 64;
@@ -24,6 +27,7 @@ const topOffset = 72;
 
 const nodeTypes: NodeTypes = {
   course: CourseNode,
+  semester: SemesterNode,
 };
 
 const walkGraph = (startId: string, adjacency: Map<string, string[]>) => {
@@ -41,7 +45,7 @@ const walkGraph = (startId: string, adjacency: Map<string, string[]>) => {
   return visited;
 };
 
-const buildLayout = (courses: Course[]): { nodes: Node<Course>[]; edges: Edge[] } => {
+const buildLayout = (courses: Course[]): { nodes: Node<FlowNodeData>[]; edges: Edge[] } => {
   const graph = new dagre.graphlib.Graph();
   graph.setDefaultEdgeLabel(() => ({}));
   graph.setGraph({ rankdir: 'LR', nodesep: 42, ranksep: 70 });
@@ -105,7 +109,10 @@ export function CurriculumFlow() {
   const [hoveredCourseId, setHoveredCourseId] = useState<string | null>(null);
   const clearHighlightTimeout = useRef<number | null>(null);
   const maxSemester = Math.max(...courses.map((course) => course.semester), 1);
-  const semesters = Array.from({ length: Math.max(maxSemester + 1, 8) }, (_, index) => index + 1);
+  const semesters = useMemo(
+    () => Array.from({ length: Math.max(maxSemester + 1, 8) }, (_, index) => index + 1),
+    [maxSemester],
+  );
 
   const layout = useMemo(() => buildLayout(courses), [courses]);
   const semesterWorkload = useMemo(() => {
@@ -116,7 +123,31 @@ export function CurriculumFlow() {
     });
     return workloadMap;
   }, [courses]);
-  const [nodes, setNodes, onNodesChange] = useNodesState(layout.nodes);
+  const semesterNodes = useMemo<Node<FlowNodeData>[]>(
+    () =>
+      semesters.map((semester) => ({
+        id: `semester-${semester}`,
+        type: 'semester',
+        data: {
+          semester,
+          workload: semesterWorkload.get(semester) ?? 0,
+        },
+        position: {
+          x: (semester - 1) * (semesterWidth + semesterGap) + 30,
+          y: 10,
+        },
+        draggable: false,
+        selectable: false,
+        connectable: false,
+        deletable: false,
+      })),
+    [semesterWorkload, semesters],
+  );
+  const flowNodes = useMemo(
+    () => [...semesterNodes, ...layout.nodes],
+    [layout.nodes, semesterNodes],
+  );
+  const [nodes, setNodes, onNodesChange] = useNodesState(flowNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(layout.edges);
   const highlightIds = useMemo(() => {
     if (!hoveredCourseId) return null;
@@ -152,7 +183,9 @@ export function CurriculumFlow() {
 
   const nodesWithSelection = useMemo(
     () =>
-      layout.nodes.map((node) => {
+      flowNodes.map((node) => {
+        if (node.type === 'semester') return node;
+
         const isHighlighted = highlightIds?.has(node.id) ?? false;
         const isDimmed = Boolean(highlightIds && !isHighlighted);
 
@@ -167,7 +200,7 @@ export function CurriculumFlow() {
           selected: node.id === selectedCourseId,
         };
       }),
-    [highlightIds, layout.nodes, selectedCourseId],
+    [flowNodes, highlightIds, selectedCourseId],
   );
 
   const edgesWithHighlight = useMemo(
@@ -199,6 +232,8 @@ export function CurriculumFlow() {
 
   const onNodeDragStop = useCallback<NodeDragHandler>(
     (_event, node) => {
+      if (node.type !== 'course') return;
+
       const semester = Math.max(
         1,
         Math.round((node.position.x - 30) / (semesterWidth + semesterGap)) + 1,
@@ -285,16 +320,6 @@ export function CurriculumFlow() {
         }
       }}
     >
-      <div className="semester-ruler" aria-hidden="true">
-        {semesters.map((semester) => {
-          const workload = semesterWorkload.get(semester) ?? 0;
-          return (
-            <div className="semester-ruler__item" key={semester}>
-              {semester}º semestre ({workload}h)
-            </div>
-          );
-        })}
-      </div>
       {highlightedSummary ? (
         <div className="flow-highlight-summary" role="status" aria-live="polite">
           <strong>{highlightedSummary.workload}h</strong>
