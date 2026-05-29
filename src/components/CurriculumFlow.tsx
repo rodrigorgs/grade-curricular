@@ -4,7 +4,6 @@ import ReactFlow, {
   Background,
   Connection,
   Controls,
-  MiniMap,
   type Edge,
   type Node,
   type NodeDragHandler,
@@ -24,6 +23,8 @@ const nodeHeight = 64;
 const semesterWidth = 190;
 const semesterGap = 14;
 const topOffset = 72;
+const complementaryWorkload = 200;
+const extensionWorkload = 320;
 
 const nodeTypes: NodeTypes = {
   course: CourseNode,
@@ -44,6 +45,16 @@ const walkGraph = (startId: string, adjacency: Map<string, string[]>) => {
 
   return visited;
 };
+
+const getDepartment = (course: Course) => {
+  if (course.department?.trim()) return course.department.trim().toUpperCase();
+
+  const code = course.code.trim().toUpperCase();
+  const prefix = code.match(/^[A-Z]+/)?.[0];
+  return prefix || 'SEM DEPTO.';
+};
+
+const isOptionalCourse = (course: Course) => course.nature?.trim().toUpperCase() === 'OP';
 
 const buildLayout = (courses: Course[]): { nodes: Node<FlowNodeData>[]; edges: Edge[] } => {
   const graph = new dagre.graphlib.Graph();
@@ -180,6 +191,49 @@ export function CurriculumFlow() {
       workload,
     };
   }, [courses, highlightIds]);
+
+  const curriculumStats = useMemo(() => {
+    const departmentWorkload = new Map<string, number>();
+    let requiredWorkload = 0;
+    let optionalWorkload = 0;
+
+    courses.forEach((course) => {
+      if (isOptionalCourse(course)) {
+        optionalWorkload += course.workload;
+      } else {
+        requiredWorkload += course.workload;
+      }
+
+      const department = getDepartment(course);
+      departmentWorkload.set(department, (departmentWorkload.get(department) ?? 0) + course.workload);
+    });
+
+    return {
+      requiredWorkload,
+      optionalWorkload,
+      complementaryWorkload,
+      extensionWorkload,
+      totalWorkload:
+        requiredWorkload + optionalWorkload + complementaryWorkload + extensionWorkload,
+      departmentRows: [...departmentWorkload.entries()].sort(([a], [b]) => a.localeCompare(b)),
+    };
+  }, [courses]);
+  const courseById = useMemo(() => new Map(courses.map((course) => [course.id, course])), [courses]);
+  const selectedCourseDetails = useMemo(() => {
+    if (!selectedCourseId) return null;
+
+    const course = courseById.get(selectedCourseId);
+    if (!course) return null;
+
+    return {
+      course,
+      department: getDepartment(course),
+      prerequisites: course.prerequisites
+        .map((id) => courseById.get(id))
+        .filter((item): item is Course => Boolean(item)),
+      dependents: courses.filter((item) => item.prerequisites.includes(course.id)),
+    };
+  }, [courseById, courses, selectedCourseId]);
 
   const nodesWithSelection = useMemo(
     () =>
@@ -330,6 +384,115 @@ export function CurriculumFlow() {
           </span>
         </div>
       ) : null}
+      {selectedCourseDetails ? (
+        <aside className="flow-course-details" aria-label="Detalhes da disciplina selecionada">
+          <div className="flow-course-details__header">
+            <div>
+              <p>{selectedCourseDetails.course.code}</p>
+              <h2>{selectedCourseDetails.course.name}</h2>
+            </div>
+            <button
+              type="button"
+              className="flow-course-details__close"
+              onClick={() => selectCourse(null)}
+              aria-label="Fechar detalhes da disciplina"
+              title="Fechar detalhes"
+            >
+              x
+            </button>
+          </div>
+          <dl className="flow-course-details__grid">
+            <div>
+              <dt>Semestre</dt>
+              <dd>{selectedCourseDetails.course.semester}º</dd>
+            </div>
+            <div>
+              <dt>Carga horaria</dt>
+              <dd>{selectedCourseDetails.course.workload}h</dd>
+            </div>
+            <div>
+              <dt>Natureza</dt>
+              <dd>{selectedCourseDetails.course.nature || 'Nao informada'}</dd>
+            </div>
+            <div>
+              <dt>Categoria</dt>
+              <dd>{selectedCourseDetails.course.category || 'Nao informada'}</dd>
+            </div>
+            <div>
+              <dt>Departamento</dt>
+              <dd>{selectedCourseDetails.department}</dd>
+            </div>
+            <div>
+              <dt>Status</dt>
+              <dd>{selectedCourseDetails.course.status}</dd>
+            </div>
+          </dl>
+          <div className="flow-course-details__section">
+            <h3>Pre-requisitos</h3>
+            {selectedCourseDetails.prerequisites.length > 0 ? (
+              <ul>
+                {selectedCourseDetails.prerequisites.map((course) => (
+                  <li key={course.id}>
+                    {course.code} - {course.name}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>Nenhum</p>
+            )}
+          </div>
+          <div className="flow-course-details__section">
+            <h3>Desbloqueia</h3>
+            {selectedCourseDetails.dependents.length > 0 ? (
+              <ul>
+                {selectedCourseDetails.dependents.map((course) => (
+                  <li key={course.id}>
+                    {course.code} - {course.name}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>Nenhuma disciplina</p>
+            )}
+          </div>
+        </aside>
+      ) : null}
+      <aside className="flow-stats" aria-label="Estatisticas da grade curricular">
+        <h2>Estatisticas</h2>
+        <dl className="flow-stats__totals">
+          <div>
+            <dt>CH obrigatoria</dt>
+            <dd>{curriculumStats.requiredWorkload}h</dd>
+          </div>
+          <div>
+            <dt>CH optativa</dt>
+            <dd>{curriculumStats.optionalWorkload}h</dd>
+          </div>
+          <div>
+            <dt>CH complementar</dt>
+            <dd>{curriculumStats.complementaryWorkload}h</dd>
+          </div>
+          <div>
+            <dt>CH de extensao</dt>
+            <dd>{curriculumStats.extensionWorkload}h</dd>
+          </div>
+          <div>
+            <dt>CH total</dt>
+            <dd>{curriculumStats.totalWorkload}h</dd>
+          </div>
+        </dl>
+        <div className="flow-stats__departments">
+          <h3>Por departamento</h3>
+          <dl>
+            {curriculumStats.departmentRows.map(([department, workload]) => (
+              <div key={department}>
+                <dt>{department}</dt>
+                <dd>{workload}h</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </aside>
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -355,7 +518,6 @@ export function CurriculumFlow() {
       >
         <Background gap={24} size={1} />
         <Controls />
-        <MiniMap pannable zoomable nodeColor="#4f7cff" />
       </ReactFlow>
     </section>
   );

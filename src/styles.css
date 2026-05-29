@@ -279,6 +279,179 @@ select[multiple] {
   line-height: 1;
 }
 
+.flow-course-details {
+  background: rgba(255, 255, 255, 0.97);
+  border: 1px solid #dce4ee;
+  border-radius: 8px;
+  box-shadow: 0 12px 30px rgba(23, 32, 51, 0.14);
+  color: #526173;
+  left: 14px;
+  max-height: min(440px, calc(100% - 28px));
+  overflow: auto;
+  padding: 14px;
+  position: absolute;
+  top: 14px;
+  width: 360px;
+  z-index: 6;
+}
+
+.flow-course-details__header {
+  align-items: start;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.flow-course-details__header p {
+  color: #1f6feb;
+  font-size: 0.76rem;
+  font-weight: 900;
+  margin: 0 0 4px;
+}
+
+.flow-course-details__header h2 {
+  color: #172033;
+  font-size: 1rem;
+  line-height: 1.18;
+  margin: 0;
+}
+
+.flow-course-details__close {
+  background: #e9eef5;
+  color: #172033;
+  flex: 0 0 auto;
+  height: 30px;
+  justify-content: center;
+  min-height: 30px;
+  padding: 0;
+  width: 30px;
+}
+
+.flow-course-details__grid {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 1fr 1fr;
+  margin: 14px 0 0;
+}
+
+.flow-course-details__grid div {
+  border-top: 1px solid #e4ebf2;
+  padding-top: 8px;
+}
+
+.flow-course-details dt,
+.flow-course-details__section h3 {
+  color: #526173;
+  font-size: 0.72rem;
+  font-weight: 900;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.flow-course-details dd {
+  color: #172033;
+  font-size: 0.88rem;
+  font-weight: 800;
+  margin: 3px 0 0;
+}
+
+.flow-course-details__section {
+  border-top: 1px solid #e4ebf2;
+  margin-top: 12px;
+  padding-top: 10px;
+}
+
+.flow-course-details__section ul {
+  color: #172033;
+  display: grid;
+  gap: 6px;
+  font-size: 0.82rem;
+  line-height: 1.28;
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+}
+
+.flow-course-details__section li {
+  background: #f4f7f9;
+  border-radius: 6px;
+  padding: 6px 8px;
+}
+
+.flow-course-details__section p {
+  font-size: 0.84rem;
+  margin: 8px 0 0;
+}
+
+.flow-stats {
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid #dce4ee;
+  border-radius: 8px;
+  bottom: 14px;
+  box-shadow: 0 12px 30px rgba(23, 32, 51, 0.14);
+  color: #526173;
+  max-height: min(320px, calc(100% - 28px));
+  overflow: auto;
+  padding: 12px;
+  position: absolute;
+  right: 14px;
+  width: 250px;
+  z-index: 5;
+}
+
+.flow-stats h2,
+.flow-stats h3 {
+  color: #172033;
+  line-height: 1;
+  margin: 0;
+}
+
+.flow-stats h2 {
+  font-size: 0.95rem;
+}
+
+.flow-stats h3 {
+  font-size: 0.78rem;
+  margin-top: 12px;
+  text-transform: uppercase;
+}
+
+.flow-stats dl {
+  margin: 0;
+}
+
+.flow-stats__totals {
+  display: grid;
+  gap: 7px;
+  margin-top: 10px !important;
+}
+
+.flow-stats__totals div,
+.flow-stats__departments div {
+  align-items: baseline;
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.flow-stats dt {
+  font-size: 0.8rem;
+}
+
+.flow-stats dd {
+  color: #172033;
+  font-size: 0.86rem;
+  font-weight: 800;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.flow-stats__departments dl {
+  display: grid;
+  gap: 5px;
+  margin-top: 8px;
+}
+
 .react-flow__pane {
   cursor: grab;
 }
