@@ -395,7 +395,7 @@ select[multiple] {
   padding: 12px;
   position: absolute;
   right: 14px;
-  width: 250px;
+  width: 390px;
   z-index: 5;
 }
 
@@ -422,7 +422,8 @@ select[multiple] {
 
 .flow-stats__totals {
   display: grid;
-  gap: 7px;
+  gap: 7px 14px;
+  grid-template-columns: 1fr 1fr;
   margin-top: 10px !important;
 }
 
@@ -448,7 +449,8 @@ select[multiple] {
 
 .flow-stats__departments dl {
   display: grid;
-  gap: 5px;
+  gap: 5px 14px;
+  grid-template-columns: 1fr 1fr;
   margin-top: 8px;
 }
 
