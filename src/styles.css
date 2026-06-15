@@ -103,6 +103,12 @@ select[multiple] {
   gap: 10px;
 }
 
+.app-header__actions {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+}
+
 .eyebrow {
   color: #1f6feb !important;
   font-size: 0.76rem;
@@ -142,6 +148,52 @@ select[multiple] {
 .view-toolbar button.is-active {
   background: #1f6feb;
   color: #ffffff;
+}
+
+.view-menu {
+  position: relative;
+}
+
+.view-menu__trigger {
+  background: #e9eef5;
+  color: #172033;
+  height: 36px;
+  justify-content: center;
+  padding: 0;
+  width: 36px;
+}
+
+.view-menu__trigger:hover {
+  background: #dbe4ef;
+}
+
+.view-menu__options {
+  background: #ffffff;
+  border: 1px solid #dce4ee;
+  border-radius: 8px;
+  box-shadow: 0 16px 38px rgba(23, 32, 51, 0.16);
+  display: grid;
+  gap: 4px;
+  min-width: 190px;
+  padding: 6px;
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  z-index: 20;
+}
+
+.view-menu__options button {
+  background: transparent;
+  color: #172033;
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.view-menu__options button:hover,
+.view-menu__options button.is-active {
+  background: #eef5ff;
+  color: #1f6feb;
+  transform: none;
 }
 
 .text-link {
@@ -858,6 +910,14 @@ tbody tr.is-selected {
 
   .app-header__aside {
     align-items: flex-start;
+  }
+
+  .app-header__actions {
+    width: 100%;
+  }
+
+  .view-menu {
+    margin-left: auto;
   }
 
   .flow-panel,
