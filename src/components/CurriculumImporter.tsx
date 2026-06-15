@@ -1,11 +1,12 @@
 import { useMemo, useState, type ChangeEvent } from 'react';
-import { ClipboardCopy, FileUp, Upload } from 'lucide-react';
+import { ClipboardCopy, FileUp, RotateCcw, Upload } from 'lucide-react';
 import { exportCoursesToTsv, parseCurriculumTsv } from '../lib/tsvImport';
 import { useCurriculumStore } from '../store/curriculumStore';
 
 export function CurriculumImporter() {
   const courses = useCurriculumStore((state) => state.courses);
   const importCourses = useCurriculumStore((state) => state.importCourses);
+  const reset = useCurriculumStore((state) => state.reset);
   const [text, setText] = useState('');
   const [message, setMessage] = useState('Cole um TSV ou selecione um arquivo para importar.');
 
@@ -38,6 +39,12 @@ export function CurriculumImporter() {
     );
   };
 
+  const onReset = () => {
+    reset();
+    setText('');
+    setMessage('Grade resetada a partir de data/curriculo-novo.tsv.');
+  };
+
   return (
     <section className="import-panel" aria-label="Importar grade por TSV">
       <div className="import-panel__header">
@@ -48,6 +55,10 @@ export function CurriculumImporter() {
         <button type="button" onClick={onExport}>
           <ClipboardCopy size={16} />
           Exportar TSV
+        </button>
+        <button type="button" className="button-secondary" onClick={onReset}>
+          <RotateCcw size={16} />
+          Resetar grade
         </button>
         <label className="file-button">
           <FileUp size={16} />
@@ -62,7 +73,7 @@ export function CurriculumImporter() {
           setText(event.target.value);
           setMessage('Dados prontos para revisao.');
         }}
-        placeholder="Cole aqui as colunas Semestre, id, Nome, CH, Pre-requisito, Natureza, Categoria e Departamento."
+        placeholder="Cole aqui as colunas Semestre, id, Nome, CH, Pre-requisito, Natureza, Categoria, Departamento e Ementa."
         aria-label="Dados TSV da grade curricular"
       />
 
@@ -89,4 +100,3 @@ export function CurriculumImporter() {
     </section>
   );
 }
-

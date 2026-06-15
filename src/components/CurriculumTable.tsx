@@ -156,6 +156,17 @@ export function CurriculumTable() {
         ),
       },
       {
+        accessorKey: 'syllabus',
+        header: 'Ementa',
+        cell: ({ row, getValue }) => (
+          <input
+            value={getValue<string | undefined>() ?? ''}
+            onChange={(event) => updateCourse(row.original.id, { syllabus: event.target.value })}
+            aria-label={`Ementa de ${row.original.name}`}
+          />
+        ),
+      },
+      {
         id: 'actions',
         header: '',
         cell: ({ row }) => (
@@ -196,7 +207,7 @@ export function CurriculumTable() {
           </button>
           <button type="button" className="button-secondary" onClick={reset}>
             <RotateCcw size={16} />
-            Restaurar
+            Resetar grade
           </button>
         </div>
       </div>

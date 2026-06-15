@@ -11,6 +11,7 @@ export type Course = {
   nature?: string;
   category?: string;
   department?: string;
+  syllabus?: string;
 };
 
 export type CourseDraft = Omit<Course, 'id'>;

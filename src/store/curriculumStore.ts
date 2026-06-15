@@ -1,11 +1,13 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import defaultCurriculumTsv from '../../data/curriculo-novo.tsv?raw';
 import { initialCourses } from '../data/initialCourses';
 import {
   clampSemester,
   resolveAllowedSemester,
   sanitizePrerequisites,
 } from '../lib/curriculumRules';
+import { parseCurriculumTsv } from '../lib/tsvImport';
 import type { Course, CourseDraft } from '../types';
 
 type CurriculumState = {
@@ -38,10 +40,29 @@ const createId = (course: CourseDraft, existingIds: string[]) => {
   return `${base}-${suffix}`;
 };
 
+const normalizeCourses = (courses: Course[]) => {
+  const nextCourses = courses.map((course) => ({
+    ...course,
+    semester: clampSemester(course.semester),
+  }));
+
+  return nextCourses.map((course) => ({
+    ...course,
+    prerequisites: sanitizePrerequisites(nextCourses, course.id, course.prerequisites),
+  }));
+};
+
+const loadDefaultCourses = () => {
+  const parsed = parseCurriculumTsv(defaultCurriculumTsv);
+  return normalizeCourses(parsed.courses.length > 0 ? parsed.courses : initialCourses);
+};
+
+const defaultCourses = loadDefaultCourses();
+
 export const useCurriculumStore = create<CurriculumState>()(
   persist(
     (set) => ({
-      courses: initialCourses,
+      courses: defaultCourses,
       selectedCourseId: null,
       selectCourse: (id) => set({ selectedCourseId: id }),
       addCourse: (course) =>
@@ -65,16 +86,8 @@ export const useCurriculumStore = create<CurriculumState>()(
         }),
       importCourses: (courses) =>
         set(() => {
-          const nextCourses = courses.map((course) => ({
-            ...course,
-            semester: clampSemester(course.semester),
-          }));
-
           return {
-            courses: nextCourses.map((course) => ({
-              ...course,
-              prerequisites: sanitizePrerequisites(nextCourses, course.id, course.prerequisites),
-            })),
+            courses: normalizeCourses(courses),
             selectedCourseId: null,
           };
         }),
@@ -133,7 +146,7 @@ export const useCurriculumStore = create<CurriculumState>()(
               : course,
           ),
         })),
-      reset: () => set({ courses: initialCourses, selectedCourseId: null }),
+      reset: () => set({ courses: defaultCourses, selectedCourseId: null }),
     }),
     {
       name: 'curriculum',

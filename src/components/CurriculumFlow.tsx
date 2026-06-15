@@ -428,6 +428,10 @@ export function CurriculumFlow() {
             </div>
           </dl>
           <div className="flow-course-details__section">
+            <h3>Ementa</h3>
+            <p>{selectedCourseDetails.course.syllabus || 'Nao informada'}</p>
+          </div>
+          <div className="flow-course-details__section">
             <h3>Pre-requisitos</h3>
             {selectedCourseDetails.prerequisites.length > 0 ? (
               <ul>

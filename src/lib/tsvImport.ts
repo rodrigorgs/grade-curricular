@@ -82,6 +82,14 @@ const parseTsvRows = (text: string) => {
 const findColumn = (headers: string[], candidates: string[]) =>
   headers.findIndex((header) => candidates.some((candidate) => header.includes(candidate)));
 
+const findExactColumn = (headers: string[], candidates: string[]) =>
+  headers.findIndex((header) => candidates.includes(header));
+
+const findPreferredColumn = (headers: string[], exactCandidates: string[], fuzzyCandidates: string[]) => {
+  const exactIndex = findExactColumn(headers, exactCandidates);
+  return exactIndex >= 0 ? exactIndex : findColumn(headers, fuzzyCandidates);
+};
+
 const splitPrerequisites = (value: string) =>
   value
     .split(',')
@@ -89,7 +97,17 @@ const splitPrerequisites = (value: string) =>
     .filter(Boolean);
 
 export const exportCoursesToTsv = (courses: Course[]): string => {
-  const header = ['Semestre', 'id', 'Nome', 'CH', 'Pre-requisito', 'Natureza', 'Categoria', 'Departamento'];
+  const header = [
+    'Semestre',
+    'id',
+    'Nome',
+    'CH',
+    'Pre-requisito',
+    'Natureza',
+    'Categoria',
+    'Departamento',
+    'Ementa',
+  ];
   const idToCode = new Map(courses.map((c) => [c.id, c.code || c.id]));
   const rows = courses.map((course) => [
     String(course.semester),
@@ -100,6 +118,7 @@ export const exportCoursesToTsv = (courses: Course[]): string => {
     course.nature ?? '',
     course.category ?? '',
     course.department ?? '',
+    course.syllabus ?? '',
   ]);
   return [header, ...rows].map((row) => row.join('\t')).join('\n');
 };
@@ -112,13 +131,14 @@ export const parseCurriculumTsv = (text: string): TsvImportResult => {
 
   const headers = rows[0].map(normalizeHeader);
   const semesterIndex = findColumn(headers, ['semestre']);
-  const codeIndex = findColumn(headers, ['id', 'codigo', 'cod']);
+  const codeIndex = findPreferredColumn(headers, ['id'], ['codigo', 'cod']);
   const nameIndex = findColumn(headers, ['nome', 'disciplina']);
   const workloadIndex = findColumn(headers, ['ch', 'cargahoraria']);
   const prerequisitesIndex = findColumn(headers, ['prerequisito']);
   const natureIndex = findColumn(headers, ['natureza']);
   const categoryIndex = findColumn(headers, ['categoria']);
   const departmentIndex = findColumn(headers, ['departamento', 'depto', 'department']);
+  const syllabusIndex = findPreferredColumn(headers, ['ementaproposta', 'ementa'], ['syllabus']);
 
   const required = [
     ['Semestre', semesterIndex],
@@ -178,6 +198,7 @@ export const parseCurriculumTsv = (text: string): TsvImportResult => {
         nature: natureIndex >= 0 ? row[natureIndex] || undefined : undefined,
         category: categoryIndex >= 0 ? row[categoryIndex] || undefined : undefined,
         department: departmentIndex >= 0 ? row[departmentIndex] || undefined : undefined,
+        syllabus: syllabusIndex >= 0 ? row[syllabusIndex] || undefined : undefined,
       },
     ];
   });
@@ -198,4 +219,3 @@ export const parseCurriculumTsv = (text: string): TsvImportResult => {
 
   return { courses: coursesWithPrerequisites, skippedRows, warnings };
 };
-
