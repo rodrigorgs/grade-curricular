@@ -3,5 +3,13 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   base: process.env.GITHUB_ACTIONS ? '/grade-curricular/' : '/',
+  build: {
+    rollupOptions: {
+      input: {
+        main: 'index.html',
+        optativas: 'optativas.html',
+      },
+    },
+  },
   plugins: [react()],
 });

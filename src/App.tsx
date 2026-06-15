@@ -17,10 +17,15 @@ function App() {
           <p className="eyebrow">Editor client-side</p>
           <h1>Grade curricular</h1>
         </div>
-        <p>
-          Edite disciplinas, carga horaria, semestres e pre-requisitos. Arraste um bloco no
-          fluxograma para realocar a disciplina entre semestres.
-        </p>
+        <div className="app-header__aside">
+          <p>
+            Edite disciplinas, carga horaria, semestres e pre-requisitos. Arraste um bloco no
+            fluxograma para realocar a disciplina entre semestres.
+          </p>
+          <a className="text-link" href="./optativas.html">
+            Optativas
+          </a>
+        </div>
       </header>
 
       <div className="view-toolbar" aria-label="Modo de visualizacao">
