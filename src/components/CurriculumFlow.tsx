@@ -11,6 +11,7 @@ import ReactFlow, {
   useEdgesState,
   useNodesState,
 } from 'reactflow';
+import { BarChart3, X } from 'lucide-react';
 import CourseNode from './CourseNode';
 import SemesterNode, { type SemesterNodeData } from './SemesterNode';
 import { useCurriculumStore } from '../store/curriculumStore';
@@ -118,6 +119,7 @@ export function CurriculumFlow() {
   const moveCourseToSemester = useCurriculumStore((state) => state.moveCourseToSemester);
   const setPrerequisites = useCurriculumStore((state) => state.setPrerequisites);
   const [hoveredCourseId, setHoveredCourseId] = useState<string | null>(null);
+  const [showStats, setShowStats] = useState(false);
   const clearHighlightTimeout = useRef<number | null>(null);
   const maxSemester = Math.max(...courses.map((course) => course.semester), 1);
   const semesters = useMemo(
@@ -461,42 +463,59 @@ export function CurriculumFlow() {
           </div>
         </aside>
       ) : null}
-      <aside className="flow-stats" aria-label="Estatisticas da grade curricular">
-        <h2>Estatisticas</h2>
-        <dl className="flow-stats__totals">
-          <div>
-            <dt>CH obrigatoria</dt>
-            <dd>{curriculumStats.requiredWorkload}h</dd>
-          </div>
-          <div>
-            <dt>CH optativa</dt>
-            <dd>{curriculumStats.optionalWorkload}h</dd>
-          </div>
-          <div>
-            <dt>CH complementar</dt>
-            <dd>{curriculumStats.complementaryWorkload}h</dd>
-          </div>
-          <div>
-            <dt>CH de extensao</dt>
-            <dd>{curriculumStats.extensionWorkload}h</dd>
-          </div>
-          <div>
-            <dt>CH total</dt>
-            <dd>{curriculumStats.totalWorkload}h</dd>
-          </div>
-        </dl>
-        <div className="flow-stats__departments">
-          <h3>Por departamento</h3>
-          <dl>
-            {curriculumStats.departmentRows.map(([department, workload]) => (
-              <div key={department}>
-                <dt>{department}</dt>
-                <dd>{workload}h</dd>
-              </div>
-            ))}
+      <button
+        type="button"
+        className="flow-stats-toggle"
+        onClick={() => setShowStats((current) => !current)}
+        aria-controls="flow-stats-panel"
+        aria-expanded={showStats}
+        aria-label={showStats ? 'Esconder estatisticas' : 'Exibir estatisticas'}
+        title={showStats ? 'Esconder estatisticas' : 'Exibir estatisticas'}
+      >
+        {showStats ? <X size={17} /> : <BarChart3 size={17} />}
+      </button>
+      {showStats ? (
+        <aside
+          className="flow-stats"
+          id="flow-stats-panel"
+          aria-label="Estatisticas da grade curricular"
+        >
+          <h2>Estatisticas</h2>
+          <dl className="flow-stats__totals">
+            <div>
+              <dt>CH obrigatoria</dt>
+              <dd>{curriculumStats.requiredWorkload}h</dd>
+            </div>
+            <div>
+              <dt>CH optativa</dt>
+              <dd>{curriculumStats.optionalWorkload}h</dd>
+            </div>
+            <div>
+              <dt>CH complementar</dt>
+              <dd>{curriculumStats.complementaryWorkload}h</dd>
+            </div>
+            <div>
+              <dt>CH de extensao</dt>
+              <dd>{curriculumStats.extensionWorkload}h</dd>
+            </div>
+            <div>
+              <dt>CH total</dt>
+              <dd>{curriculumStats.totalWorkload}h</dd>
+            </div>
           </dl>
-        </div>
-      </aside>
+          <div className="flow-stats__departments">
+            <h3>Por departamento</h3>
+            <dl>
+              {curriculumStats.departmentRows.map(([department, workload]) => (
+                <div key={department}>
+                  <dt>{department}</dt>
+                  <dd>{workload}h</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        </aside>
+      ) : null}
       <ReactFlow
         nodes={nodes}
         edges={edges}

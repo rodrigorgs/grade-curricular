@@ -383,11 +383,35 @@ select[multiple] {
   margin: 8px 0 0;
 }
 
+.flow-stats-toggle {
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #dce4ee;
+  border-radius: 8px;
+  bottom: 14px;
+  box-shadow: 0 10px 24px rgba(23, 32, 51, 0.12);
+  color: #172033;
+  display: inline-flex;
+  height: 36px;
+  justify-content: center;
+  min-height: 36px;
+  padding: 0;
+  position: absolute;
+  right: 14px;
+  width: 36px;
+  z-index: 6;
+}
+
+.flow-stats-toggle:hover {
+  background: #f4f7f9;
+  transform: none;
+}
+
 .flow-stats {
   background: rgba(255, 255, 255, 0.96);
   border: 1px solid #dce4ee;
   border-radius: 8px;
-  bottom: 14px;
+  bottom: 58px;
   box-shadow: 0 12px 30px rgba(23, 32, 51, 0.14);
   color: #526173;
   max-height: min(320px, calc(100% - 28px));
