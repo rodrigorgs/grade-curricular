@@ -123,7 +123,7 @@ export function CurriculumFlow() {
   const clearHighlightTimeout = useRef<number | null>(null);
   const maxSemester = Math.max(...courses.map((course) => course.semester), 1);
   const semesters = useMemo(
-    () => Array.from({ length: Math.max(maxSemester + 1, 8) }, (_, index) => index + 1),
+    () => Array.from({ length: Math.max(maxSemester, 8) }, (_, index) => index + 1),
     [maxSemester],
   );
 
